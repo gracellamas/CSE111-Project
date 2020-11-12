@@ -42,7 +42,7 @@ from restaurant, menu,
         and menu.cost in (14)
 ) sq
 where restaurant.menukey = menu.menukey
-    and menu.cost in (16)
+    and menu.cost in (16);
 
 -- 7. Find the restaurants located in San Francisco, CA. 
 -- Print the restaurant name and its address
@@ -63,7 +63,7 @@ where m1.menukey = res1.menukey
     and res2.locationkey = l2.locationkey
     -- addresses of restaurant 1 and restaurant 2
     and l1.address = "222 Mason St, San Francisco, CA 94102"
-    and l2.address = "300 Grove St, San Francisco, CA 94102"
+    and l2.address = "300 Grove St, San Francisco, CA 94102";
 
 -- 9. For every restaurant, count the number of items in their menu
 -- List the results in descending order
@@ -87,17 +87,39 @@ left outer join
     group by country.name
 ) sq on c2.name = sq.name;
 
--- 11.
+-- 11. How many customers did not leave a review in x Restaurant?
+select count(*)
+from restaurant, customer
+where restaurant.restaurantkey = customer.restaurantkey
+    and restaurant.name != "Restaurant Anzu";
 
--- 12.
+-- 12. What restaurants have restaurants in California and Texas
+select restaurant.name
+from restaurant, location
+where restaurant.locationkey = location.locationkey
+    and address like "%CA______"
+intersect
+select restaurant.name
+from restaurant, location
+where restaurant.locationkey = location.locationkey
+    and address like "%TX______";
 
--- 13.
+-- 13. What restaurants offer menus larger than x items?
+select restaurant.name, count(menu.item) as menuSize
+from restaurant, menu
+where restaurant.menukey = menu.menukey
+group by restaurant.name
+having menuSize > 2;
 
--- 14.
+-- 14. What are all the items offered for a restaurant in all their locations?
+select distinct menu.item
+from restaurant, menu
+where restaurant.name = "BAIA"
+    and restaurant.menukey = menu.menukey;
 
 -- 15 to 20. insert queries
 
-
+-- 21. to xx: additional queries
 
 -- TEST QUERIES
 -- count the restaurants in UK, currently 0 in the version i have
