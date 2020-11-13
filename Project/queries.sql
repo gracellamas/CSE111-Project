@@ -32,18 +32,19 @@ where restaurant.menukey = menu.menukey
 
 -- 6. Count the number of distinct restaurants
 -- that have menus containing items that have costs of $14 and $16
--- *** I think this is right b/c it doesn't count Restaurant Anzu anymore when I run query 3 b4 running this query
-select count(distinct restaurant.name)
-from restaurant, menu,
+select count(sq.name)
+from
 (
-    -- select the restaurants with menu costs of 14
     select distinct restaurant.name
     from restaurant, menu
     where restaurant.menukey = menu.menukey
         and menu.cost in (14)
-) sq
-where restaurant.menukey = menu.menukey
-    and menu.cost in (16);
+    intersect
+    select distinct restaurant.name
+    from restaurant, menu
+    where restaurant.menukey = menu.menukey
+        and menu.cost in (16)
+) sq;
 
 -- 7. Find the restaurants located in San Francisco, CA. 
 -- Print the restaurant name and its address
@@ -144,3 +145,16 @@ where restaurant.name = "BAIA"
 --     and c1.name = "USA"
 --     and c2.name = "UK"
 -- group by c1.name, c2.name
+
+-- 6. *** I think this is right b/c it doesn't count Restaurant Anzu anymore when I run query 3 b4 running this query
+-- select restaurant.name, count(distinct restaurant.name)
+-- from restaurant, menu,
+-- (
+--     -- select the restaurants with menu costs of 14
+--     select distinct restaurant.name
+--     from restaurant, menu
+--     where restaurant.menukey = menu.menukey
+--         and menu.cost in (14)
+-- ) sq
+-- where restaurant.menukey = menu.menukey
+--     and menu.cost in (16);
