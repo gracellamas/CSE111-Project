@@ -52,9 +52,6 @@ CREATE TABLE basket (
 -- Populate every table with the corresponding data.
 
 -- Restaurant
-
--- notes: add more attributes i.e type of food (mexican, american, etc)
---   
 INSERT INTO restaurant(name, pricing, menukey, locationkey, restaurantkey)
     VALUES 
         ("Restaurant Anzu", "$$$", 1, 1, 1), -- San Fran
