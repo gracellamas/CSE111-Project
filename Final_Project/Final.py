@@ -204,7 +204,7 @@ def searchBy(_conn):
 
         # user selects '...Reviews'
         elif choice == "2":
-            print ("REVIEW SEARCH\n")
+            print ("\nREVIEW SEARCH\n")
             temp = input("Enter Stars: ")
 
             print("")
@@ -231,7 +231,7 @@ def searchBy(_conn):
 
         # user selects '...Location'
         elif choice == "3":
-            print ("LOCATION SEARCH\n")
+            print ("\nLOCATION SEARCH\n")
             temp = input("Enter Location(input '%' before and after): ")
 
             print("")
@@ -257,7 +257,7 @@ def searchBy(_conn):
 
         # user selects '...Price Range'
         elif choice == "4":
-            print ("PRICE RANGE SEARCH\n")
+            print ("\nPRICE RANGE SEARCH\n")
             temp = input("Enter Pricing: ")
 
             print("")
@@ -285,8 +285,8 @@ def searchBy(_conn):
         elif choice == "b":
             run(_conn)
 
-        #end
-        #print("")
+        else:
+            searchBy(_conn)
 
     except Error as e:
         print(e)
@@ -369,32 +369,33 @@ def ins_Del_Upd(_conn):
     global num_reviewKeys
 
     try:
-        restaurant = input("\nEnter a restaurant: ")
-
-        # get the restaurantkey
-        sql = """select restaurantkey
-                from restaurant
-                where name = ?"""
-
-        cur = _conn.cursor()
-        cur.execute(sql, [restaurant])
-
-        # save the restaurantkey into restaurant
-        rows = cur.fetchall()
-        for row in rows:
-            l = '{:1}'.format(row[0])
-        restaurant_Key = "" + l
-
         print("\nSelect an option for your review: \n"
         + "1. insert \n"
         + "2. delete \n"
-        + "3. update \n")    
+        + "3. update \n"
+        + "b. back")    
 
         # get user input
         temp = input("User input: ")
-
+        
         # if user chooses the insert option
         if(temp == "1"):
+            restaurant = input("\nEnter a restaurant: ")
+
+            # get the restaurantkey
+            sql = """select restaurantkey
+                    from restaurant
+                    where name = ?"""
+
+            cur = _conn.cursor()
+            cur.execute(sql, [restaurant])
+
+            # save the restaurantkey into restaurant
+            rows = cur.fetchall()
+            for row in rows:
+                l = '{:1}'.format(row[0])
+            restaurant_Key = "" + l
+
             name = input("\nEnter your name: ")
             stars = input("Enter your stars rating: ")            
 
@@ -415,6 +416,8 @@ def ins_Del_Upd(_conn):
 
             print("\nInsert Success!")
 
+            ins_Del_Upd(_conn)
+
         # if user chooses the delete option
         elif(temp == "2"):
             reviewkey = input("\nEnter your reviewkey: ")
@@ -434,6 +437,8 @@ def ins_Del_Upd(_conn):
 
             print("Delete Success!")
 
+            ins_Del_Upd(_conn)
+
         # if user chooses the update option
         elif(temp == "3"):
             reviewkey = input("\nEnter your reviewkey: ")
@@ -448,7 +453,13 @@ def ins_Del_Upd(_conn):
 
             print("Update Success!")
 
-        run(_conn)
+            ins_Del_Upd(_conn)
+
+        elif(temp == "b"):
+            run(_conn)
+        
+        else:
+            ins_Del_Upd(_conn)
 
     except Error as e:
         print(e)
@@ -459,7 +470,8 @@ def orderBy(_conn):
     + "1. name \n"
     + "2. pricing \n"
     + "3. reviews \n"
-    + "4. country \n")
+    + "4. country \n"
+    + "b. back \n")
 
     # get user input
     temp = input("User input: ")
@@ -510,6 +522,8 @@ def orderBy(_conn):
                     l = '{}'.format(row[0])
                     print(l)
 
+            orderBy(_conn)
+
         # else if ordering by pricing
         elif temp == "2":
             print("\nSelect an option to order by price: \n"
@@ -555,6 +569,8 @@ def orderBy(_conn):
                 for row in rows:
                     l = '{:30} {:>10}'.format(row[0], row[1])
                     print(l)
+
+            orderBy(_conn)
 
         # else if ordering by reviews
         elif temp == "3":
@@ -608,6 +624,8 @@ def orderBy(_conn):
                     l = '{:30} {:>10}'.format(row[0], row[1])
                     print(l)
 
+            orderBy(_conn)
+
         # order by country
         elif temp == "4":
             sql = """select address
@@ -629,42 +647,88 @@ def orderBy(_conn):
             for row in rows:
                 l = '{:30}'.format(row[0])
                 print(l)
-    
-        run(_conn)
+
+            orderBy(_conn)
+
+        elif temp == "b":
+            run(_conn)
                         
     except Error as e:
         print(e)
 
 # ********************************** COMPAREBYPRICE FUNCTION ********************************** #
-# compares the price range of two restaurants 
-def compareByPrice(_conn):
-    first = input("\nEnter 1st Restaurant name: ")
-    second = input("Enter 2st Restaurant name: ")
-    
-    print("")
+# compares the price range of two restaurants, or their ratings 
+def compareBy(_conn):
+    print("\nCompare by\n"
+    + "1. ...Price Range\n"
+    + "2. ...rating\n"
+    + "b. back\n")
+
+    choice = input("User Input: ")
 
     try:
-        # get user input of 1st restaurant to compare
-        sql = """SELECT res1.name, round(avg(m1.cost),2), res2.name, round(avg(m2.cost),2)
-                 FROM restaurant res1, restaurant res2, menu m1, menu m2
-                 WHERE m1.menukey = res1.menukey
-                    AND m2.menukey = res2.menukey                
-                    AND res1.name = ? 
-                    AND res2.name = ?;"""
+        if choice == "1":
+            print ("\nCOMPARE BY PRICE RANGE\n")
+
+            first = input("Enter 1st Restaurant name: ")
+            second = input("Enter 2st Restaurant name: ")
+            print("")
+
+            # get user input of 1st restaurant to compare
+            sql = """SELECT res1.name, round(avg(m1.cost),2), res2.name, round(avg(m2.cost),2)
+                     FROM restaurant res1, restaurant res2, menu m1, menu m2
+                     WHERE m1.menukey = res1.menukey
+                        AND m2.menukey = res2.menukey                
+                        AND res1.name = ? 
+                        AND res2.name = ?;"""
              
-        cur = _conn.cursor()
-        cur.execute(sql, (first, second))
+            cur = _conn.cursor()
+            cur.execute(sql, (first, second))
 
-        l = '{:20} {:>20}     {:<20} {:>20}'.format("RESTAURANT1", "AVERAGE1", "RESTAURANT2", "AVERAGE2")
-        print(l)
-        print("----------------------------------------------------------------------------------------")
-        
-        rows = cur.fetchall()
-        for row in rows:
-            l = '{:20} {:>20}     {:<20} {:>20}'.format(row[0], row[1], row[2], row[3])
+            l = '{:20} {:>20}     {:<20} {:>20}'.format("RESTAURANT1", "AVERAGE1", "RESTAURANT2", "AVERAGE2")
             print(l)
+            print("----------------------------------------------------------------------------------------")
+        
+            rows = cur.fetchall()
+            for row in rows:
+                l = '{:20} {:>20}     {:<20} {:>20}'.format(row[0], row[1], row[2], row[3])
+                print(l)
 
-        run(_conn)
+            compareBy(_conn)
+        
+        elif choice == "2":
+            print("\nCOMPARE BY RATINGS\n")
+
+            first = input("Enter 1st Restaurant name: ")
+            second = input("Enter 2st Restaurant name: ")
+
+            print("")
+
+            sql = """SELECT res1.name, round(avg(rev1.stars),2), res2.name, round(avg(rev2.stars),2)
+                     FROM restaurant res1, restaurant res2, reviews rev1, reviews rev2, customer c1, customer c2
+                     WHERE c1.restaurantkey = res1.restaurantkey
+                        AND c2.restaurantkey = res2.restaurantkey  
+                        AND c1.reviewkey = rev1.reviewkey
+                        AND c2.reviewkey = rev2.reviewkey    
+                        AND res1.name = ? 
+                        AND res2.name = ?;"""
+             
+            cur = _conn.cursor()
+            cur.execute(sql, (first, second))
+
+            l = '{:20} {:>20}     {:<20} {:>20}'.format("RESTAURANT1", "STARS", "RESTAURANT2", "STARS")
+            print(l)
+            print("----------------------------------------------------------------------------------------")
+        
+            rows = cur.fetchall()
+            for row in rows:
+                l = '{:20} {:>20}     {:<20} {:>20}'.format(row[0], row[1], row[2], row[3])
+                print(l)
+
+            compareBy(_conn)
+
+        elif choice == "b":
+            run(_conn)
 
     except Error as e:
         print(e)
@@ -675,15 +739,15 @@ def printMenu():
           
   .   *   ..  . *  *
 *  * @()Ooc()*   o  .           Select an option:
-    (Q@*0CG*O()  ___            1. Search by  
-   |\_________/|/ _ \           2. Order by
-   |  |  |  |  | / | |          3. Insert/Delete/Update Review
-   |  |  |  |  | | | |          4. Compare Price Range
+    (Q@*0CG*O()  ___            
+   |\_________/|/ _ \           1. Search by  
+   |  |  |  |  | / | |          2. Order by
+   |  |  |  |  | | | |          3. Insert/Delete/Update Review
+   |  |  |  |  | | | |          4. Compare by
    |  |  |  |  | | | |          5. Create Basket
    |  |  |  |  | | | |          6. Compare number of Restaurants
-   |  |  |  |  | | | |          7. Menu Size Filter
-   |  |  |  |  | \_| |          e. Exit
-   |  |  |  |  |\___/
+   |  |  |  |  | \_| |          7. Menu Size Filter
+   |  |  |  |  |\___/           e. Exit
    |\_|__|__|_/|
     \_________/           
                                         
@@ -713,7 +777,7 @@ def run(_conn):
     
     # user selects option 4
     elif userInput == "4":
-        compareByPrice(_conn)
+        compareBy(_conn)
 
     # user selects option 5
     elif userInput == "5":
