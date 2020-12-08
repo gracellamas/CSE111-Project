@@ -628,7 +628,7 @@ def orderBy(_conn):
 
         # order by country
         elif temp == "4":
-            sql = """select address
+            sql = """select restaurant.name, address
                     from restaurant, location, country
                     where restaurant.locationkey = location.locationkey
                         and location.countrykey = country.countrykey
@@ -639,13 +639,13 @@ def orderBy(_conn):
             print("\n")
 
             # print the column headings
-            l = '{:30}'.format("ADDRESS")
-            print(l + "\n" + "-------")
+            l = '{:30}  {:50}'.format("RESTAURANT NAME", "ADDRESS")
+            print(l + "\n" + "------------------------------------------------------------")
 
             # print that entire specified table
             rows = cur.fetchall()
             for row in rows:
-                l = '{:30}'.format(row[0])
+                l = '{:30}  {:50}'.format(row[0], row[1])
                 print(l)
 
             orderBy(_conn)
