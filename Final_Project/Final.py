@@ -1,8 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
-# the current number of reviewkeys in the database
-num_reviewKeys = 59
+num_reviewKeys = 0
 
 def openConnection(_dbFile):
     # print("++++++++++++++++++++++++++++++++++")
@@ -365,21 +364,37 @@ def addInfo(_conn, temp):
 
 # ********************************** INS_DEL_UPD FUNCTION ********************************** #
 def ins_Del_Upd(_conn):
-    # get the current number of review keys
-    global num_reviewKeys
 
     try:
         print("\nSelect an option for your review: \n"
         + "1. insert \n"
         + "2. delete \n"
         + "3. update \n"
-        + "b. back")    
+        + "b. back \n")    
 
         # get user input
         temp = input("User input: ")
         
         # if user chooses the insert option
         if(temp == "1"):
+        
+            # get the current number of review keys
+            sql = """select count(reviewkey)
+                    from reviews
+                    where reviewkey != 0"""
+            cur = _conn.cursor()
+            cur.execute(sql)
+            rows = cur.fetchall()
+            for row in rows:
+                l = '{:1}'.format(row[0])
+            stringNum = "" + l
+
+            # get global variable and set to the current num
+            global num_reviewKeys
+            num_reviewKeys = 0 # reset the count
+            num_reviewKeys += int(stringNum)
+            next_reviewKey = num_reviewKeys + 1
+
             restaurant = input("\nEnter a restaurant: ")
 
             # get the restaurantkey
@@ -403,16 +418,15 @@ def ins_Del_Upd(_conn):
             sql = """insert into reviews(user, stars, reviewkey)
                     values (?, ?, ?);"""
 
-            num_reviewKeys += 1
             cur = _conn.cursor()
-            cur.execute(sql, (name, stars, num_reviewKeys))     
+            cur.execute(sql, (name, stars, next_reviewKey))     
 
             # insert to connect the review through customer
             sql = """insert into customer(name, restaurantkey, reviewkey)
                     values (?, ?, ?);"""
 
             cur = _conn.cursor()
-            cur.execute(sql, (name, restaurant_Key, num_reviewKeys))
+            cur.execute(sql, (name, restaurant_Key, next_reviewKey))
 
             print("\nInsert Success!")
 
