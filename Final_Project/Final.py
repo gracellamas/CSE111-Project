@@ -419,7 +419,8 @@ def ins_Del_Upd(_conn):
                     values (?, ?, ?);"""
 
             cur = _conn.cursor()
-            cur.execute(sql, (name, stars, next_reviewKey))     
+            cur.execute(sql, (name, stars, next_reviewKey))
+            _conn.commit()     
 
             # insert to connect the review through customer
             sql = """insert into customer(name, restaurantkey, reviewkey)
@@ -427,6 +428,7 @@ def ins_Del_Upd(_conn):
 
             cur = _conn.cursor()
             cur.execute(sql, (name, restaurant_Key, next_reviewKey))
+            _conn.commit()
 
             print("\nInsert Success!")
 
@@ -448,6 +450,7 @@ def ins_Del_Upd(_conn):
                     where reviewkey = ?"""
             cur = _conn.cursor()
             cur.execute(sql, [reviewkey])
+            _conn.commit()
 
             print("Delete Success!")
 
@@ -464,6 +467,7 @@ def ins_Del_Upd(_conn):
 
             cur = _conn.cursor()
             cur.execute(sql, (stars, reviewkey))
+            _conn.commit()
 
             print("Update Success!")
 
